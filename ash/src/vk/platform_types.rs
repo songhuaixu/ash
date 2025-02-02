@@ -29,6 +29,7 @@ pub type _screen_window = c_void;
 pub type SECURITY_ATTRIBUTES = c_void;
 // Opaque types
 pub type ANativeWindow = c_void;
+pub type NativeWindow = c_void;
 pub type AHardwareBuffer = c_void;
 pub type CAMetalLayer = c_void;
 // This definition is behind an NDA with a best effort guess from

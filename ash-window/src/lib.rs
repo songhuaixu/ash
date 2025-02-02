@@ -4,7 +4,10 @@ use std::os::raw::c_char;
 
 use ash::{
     ext::metal_surface,
-    khr::{android_surface, surface, wayland_surface, win32_surface, xcb_surface, xlib_surface},
+    khr::{
+        android_surface, ohos_surface, surface, wayland_surface, win32_surface, xcb_surface,
+        xlib_surface,
+    },
     prelude::*,
     vk, Entry, Instance,
 };
@@ -95,6 +98,13 @@ pub unsafe fn create_surface(
             surface_fn.create_android_surface(&surface_desc, allocation_callbacks)
         }
 
+        (RawDisplayHandle::Ohos(_), RawWindowHandle::OhosNdk(window)) => {
+            let surface_desc =
+                vk::SurfaceCreateInfoOHOS::default().window(window.native_window.as_ptr());
+            let surface_fn = ohos_surface::Instance::new(entry, instance);
+            surface_fn.create_ohos_surface(&surface_desc, allocation_callbacks)
+        }
+
         #[cfg(target_os = "macos")]
         (RawDisplayHandle::AppKit(_), RawWindowHandle::AppKit(window)) => {
             use raw_window_metal::{appkit, Layer};
@@ -164,6 +174,12 @@ pub fn enumerate_required_extensions(
             const ANDROID_EXTS: [*const c_char; 2] =
                 [surface::NAME.as_ptr(), android_surface::NAME.as_ptr()];
             &ANDROID_EXTS
+        }
+
+        RawDisplayHandle::Ohos(_) => {
+            const OHOS_EXTS: [*const c_char; 2] =
+                [surface::NAME.as_ptr(), ohos_surface::NAME.as_ptr()];
+            &OHOS_EXTS
         }
 
         RawDisplayHandle::AppKit(_) | RawDisplayHandle::UiKit(_) => {

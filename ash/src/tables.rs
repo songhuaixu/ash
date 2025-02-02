@@ -27,8 +27,10 @@ impl StaticFn {
                 let cname = CStr::from_bytes_with_nul_unchecked(b"vkGetInstanceProcAddr\0");
                 let val = _f(cname);
                 if val.is_null() {
+                    log::info!("ash vkGetInstanceProcAddr fail");
                     get_instance_proc_addr
                 } else {
+                    log::info!("ash vkGetInstanceProcAddr success");
                     ::core::mem::transmute(val)
                 }
             },
@@ -48,6 +50,7 @@ impl EntryFnV1_0 {
     pub fn load<F: FnMut(&CStr) -> *const c_void>(mut f: F) -> Self {
         Self::load_erased(&mut f)
     }
+
     fn load_erased(_f: &mut dyn FnMut(&CStr) -> *const c_void) -> Self {
         Self {
             create_instance: unsafe {
@@ -61,8 +64,10 @@ impl EntryFnV1_0 {
                 let cname = CStr::from_bytes_with_nul_unchecked(b"vkCreateInstance\0");
                 let val = _f(cname);
                 if val.is_null() {
+                    log::info!("ash: create_instance faile");
                     create_instance
                 } else {
+                    log::info!("ash: create_instance success");
                     ::core::mem::transmute(val)
                 }
             },

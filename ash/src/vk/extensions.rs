@@ -4173,6 +4173,18 @@ pub type PFN_vkCreateAndroidSurfaceKHR = unsafe extern "system" fn(
     p_allocator: *const AllocationCallbacks<'_>,
     p_surface: *mut SurfaceKHR,
 ) -> Result;
+
+pub const OHOS_SURFACE_NAME: &CStr = 
+    unsafe { CStr::from_bytes_with_nul_unchecked(b"VK_OHOS_surface\0") };
+pub const VK_KHR_SURFACE_SPEC_VERSION: u32 = 6u32;
+#[allow(non_camel_case_types)]
+pub type PFN_vkCreateSurfaceOHOS = unsafe extern "system" fn(
+    instance: crate::vk::Instance,
+    p_create_info: *const SurfaceCreateInfoOHOS<'_>,
+    p_allocator: *const AllocationCallbacks<'_>,
+    p_surface: *mut SurfaceKHR,
+) -> Result;
+
 pub const KHR_WIN32_SURFACE_NAME: &CStr =
     unsafe { CStr::from_bytes_with_nul_unchecked(b"VK_KHR_win32_surface\0") };
 pub const KHR_WIN32_SURFACE_SPEC_VERSION: u32 = 6u32;

@@ -8524,6 +8524,49 @@ impl<'a> AndroidSurfaceCreateInfoKHR<'a> {
         self
     }
 }
+
+#[repr(C)]
+#[cfg_attr(feature = "debug", derive(Debug))]
+#[derive(Copy, Clone)]
+#[must_use]
+pub struct SurfaceCreateInfoOHOS<'a> {
+    pub s_type: StructureType,
+    pub p_next: *const c_void,
+    pub flags: AndroidSurfaceCreateFlagsKHR,
+    pub window: *mut NativeWindow,
+    pub _marker: PhantomData<&'a ()>,
+}
+
+unsafe impl Send for SurfaceCreateInfoOHOS<'_> {}
+unsafe impl Sync for SurfaceCreateInfoOHOS<'_> {}
+impl ::core::default::Default for SurfaceCreateInfoOHOS<'_> {
+    #[inline]
+    fn default() -> Self {
+        Self {
+            s_type: Self::STRUCTURE_TYPE,
+            p_next: ::core::ptr::null(),
+            flags: AndroidSurfaceCreateFlagsKHR::default(),
+            window: ::core::ptr::null_mut(),
+            _marker: PhantomData,
+        }
+    }
+}
+unsafe impl<'a> TaggedStructure for SurfaceCreateInfoOHOS<'a> {
+    const STRUCTURE_TYPE: StructureType = StructureType::ANDROID_SURFACE_CREATE_INFO_KHR;
+}
+impl<'a> SurfaceCreateInfoOHOS<'a> {
+    #[inline]
+    pub fn flags(mut self, flags: AndroidSurfaceCreateFlagsKHR) -> Self {
+        self.flags = flags;
+        self
+    }
+    #[inline]
+    pub fn window(mut self, window: *mut NativeWindow) -> Self {
+        self.window = window;
+        self
+    }
+}
+
 #[repr(C)]
 #[cfg_attr(feature = "debug", derive(Debug))]
 #[derive(Copy, Clone)]

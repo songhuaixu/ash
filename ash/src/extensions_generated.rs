@@ -10599,6 +10599,74 @@ pub mod khr {
             }
         }
     }
+    #[doc = "VK_OHOS_surface"]
+    pub mod ohos_surface {
+        use super::super::*;
+        pub use {
+            crate::vk::OHOS_SURFACE_NAME as NAME,
+            crate::vk::VK_KHR_SURFACE_SPEC_VERSION as SPEC_VERSION,
+        };
+        #[doc = "VK_OHOS_surface instance-level functions"]
+        #[derive(Clone)]
+        pub struct Instance {
+            pub(crate) fp: InstanceFn,
+            pub(crate) handle: crate::vk::Instance,
+        }
+        impl Instance {
+            pub fn new(entry: &crate::Entry, instance: &crate::Instance) -> Self {
+                let handle = instance.handle();
+                let fp = InstanceFn::load(|name| unsafe {
+                    core::mem::transmute(entry.get_instance_proc_addr(handle, name.as_ptr()))
+                });
+                Self { handle, fp }
+            }
+            #[inline]
+            pub fn fp(&self) -> &InstanceFn {
+                &self.fp
+            }
+            #[inline]
+            pub fn instance(&self) -> crate::vk::Instance {
+                self.handle
+            }
+        }
+        #[derive(Clone)]
+        #[doc = "Raw PFN_vkCreateSurfaceOHOS instance-level function pointers"]
+        pub struct InstanceFn {
+            pub create_ohos_surface: PFN_vkCreateSurfaceOHOS,
+        }
+        unsafe impl Send for InstanceFn {}
+        unsafe impl Sync for InstanceFn {}
+        impl InstanceFn {
+            pub fn load<F: FnMut(&CStr) -> *const c_void>(mut f: F) -> Self {
+                Self::load_erased(&mut f)
+            }
+            fn load_erased(_f: &mut dyn FnMut(&CStr) -> *const c_void) -> Self {
+                Self {
+                    create_ohos_surface: unsafe {
+                        unsafe extern "system" fn create_ohos_surface(
+                            _instance: crate::vk::Instance,
+                            _p_create_info: *const SurfaceCreateInfoOHOS<'_>,
+                            _p_allocator: *const AllocationCallbacks<'_>,
+                            _p_surface: *mut SurfaceKHR,
+                        ) -> Result {
+                            panic!(concat!(
+                                "Unable to load ",
+                                stringify!(create_ohos_surface)
+                            ))
+                        }
+                        let cname =
+                            CStr::from_bytes_with_nul_unchecked(b"vkCreateSurfaceOHOS\0");
+                        let val = _f(cname);
+                        if val.is_null() {
+                            create_ohos_surface
+                        } else {
+                            ::core::mem::transmute(val)
+                        }
+                    },
+                }
+            }
+        }
+    }
     #[doc = "VK_KHR_win32_surface"]
     pub mod win32_surface {
         use super::super::*;

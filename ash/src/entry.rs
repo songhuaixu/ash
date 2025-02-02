@@ -141,15 +141,19 @@ impl Entry {
             .map_err(LoadingError::LibraryLoadFailure)
             .map(alloc::sync::Arc::new)?;
 
-        let static_fn = crate::StaticFn::load_checked(|name| {
+        let static_fn = crate::StaticFn::load_checked(|name: &ffi::CStr| {
             lib.get(name.to_bytes_with_nul())
                 .map(|symbol| *symbol)
                 .unwrap_or(ptr::null_mut())
         })?;
-
+        let fn_1_0 = Some(crate::EntryFnV1_0::load(|name: &ffi::CStr| {
+            lib.get(name.to_bytes_with_nul())
+                .map(|symbol| *symbol)
+                .unwrap_or(ptr::null_mut())
+        }));
         Ok(Self {
             _lib_guard: Some(lib),
-            ..Self::from_static_fn(static_fn)
+            ..Self::from_static_fn(static_fn, fn_1_0)
         })
     }
 
@@ -159,7 +163,10 @@ impl Entry {
     ///
     /// `static_fn` must contain valid function pointers that comply with the semantics specified
     /// by Vulkan 1.0, which must remain valid for at least the lifetime of the returned [`Entry`].
-    pub unsafe fn from_static_fn(static_fn: crate::StaticFn) -> Self {
+    pub unsafe fn from_static_fn(
+        static_fn: crate::StaticFn,
+        fn_1_0: Option<crate::EntryFnV1_0>,
+    ) -> Self {
         let load_fn = move |name: &ffi::CStr| {
             mem::transmute((static_fn.get_instance_proc_addr)(
                 vk::Instance::null(),
@@ -169,7 +176,7 @@ impl Entry {
 
         Self::from_parts_1_1(
             static_fn,
-            crate::EntryFnV1_0::load(load_fn),
+            fn_1_0.unwrap(),
             crate::EntryFnV1_1::load(load_fn),
         )
     }
